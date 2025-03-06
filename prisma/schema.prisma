@@ -1,0 +1,165 @@
+// Schéma Prisma pour stocker les données CESIM
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./cesim.db"
+}
+
+model Equipe {
+  id            Int           @id @default(autoincrement())
+  nom           String        @unique
+  estMonEquipe  Boolean       @default(false)
+  performances  Performance[]
+  marketShares  MarketShare[]
+  hrData        HrData[]
+  productions   Production[]
+  financials    Financial[]
+}
+
+model Round {
+  id           Int           @id @default(autoincrement())
+  numero       Int
+  date         String
+  commentaires String?
+  performances Performance[]
+  marketShares MarketShare[]
+  hrData       HrData[]
+  productions  Production[]
+  financials   Financial[]
+}
+
+model Performance {
+  id                Int    @id @default(autoincrement())
+  equipeId          Int
+  roundId           Int
+  // Global
+  revenuGlobal      Float
+  beneficeNetGlobal Float
+  ebitdaGlobal      Float
+  ebitGlobal        Float
+  // USA
+  revenuUSA         Float
+  beneficeNetUSA    Float
+  ebitdaUSA         Float
+  ebitUSA           Float
+  // Europe
+  revenuEurope      Float
+  beneficeNetEurope Float
+  ebitdaEurope      Float
+  ebitEurope        Float
+  // Asie
+  revenuAsie        Float
+  beneficeNetAsie   Float
+  ebitdaAsie        Float
+  ebitAsie          Float
+  // Rendement
+  rendementCumulatif Float
+  coursAction        Float
+  equipe             Equipe @relation(fields: [equipeId], references: [id])
+  round              Round  @relation(fields: [roundId], references: [id])
+
+  @@unique([equipeId, roundId])
+}
+
+model MarketShare {
+  id                 Int    @id @default(autoincrement())
+  equipeId           Int
+  roundId            Int
+  // Global
+  partMarcheGlobal   Float
+  partTechno1Global  Float
+  partTechno2Global  Float
+  partTechno3Global  Float
+  partTechno4Global  Float
+  // USA
+  partMarcheUSA      Float
+  partTechno1USA     Float
+  partTechno2USA     Float
+  partTechno3USA     Float
+  partTechno4USA     Float
+  // Europe
+  partMarcheEurope   Float
+  partTechno1Europe  Float
+  partTechno2Europe  Float
+  partTechno3Europe  Float
+  partTechno4Europe  Float
+  // Asie
+  partMarcheAsie     Float
+  partTechno1Asie    Float
+  partTechno2Asie    Float
+  partTechno3Asie    Float
+  partTechno4Asie    Float
+  equipe             Equipe @relation(fields: [equipeId], references: [id])
+  round              Round  @relation(fields: [roundId], references: [id])
+
+  @@unique([equipeId, roundId])
+}
+
+model HrData {
+  id              Int    @id @default(autoincrement())
+  equipeId        Int
+  roundId         Int
+  employesRD      Int
+  tauxRotation    Float
+  budgetFormation Int
+  salairesMensuels Int
+  equipe          Equipe @relation(fields: [equipeId], references: [id])
+  round           Round  @relation(fields: [roundId], references: [id])
+
+  @@unique([equipeId, roundId])
+}
+
+model Production {
+  id                    Int    @id @default(autoincrement())
+  equipeId              Int
+  roundId               Int
+  // Production USA
+  techno1ProductionUSA  Int
+  techno2ProductionUSA  Int
+  techno3ProductionUSA  Int
+  techno4ProductionUSA  Int
+  // Production Asie
+  techno1ProductionAsie Int
+  techno2ProductionAsie Int
+  techno3ProductionAsie Int
+  techno4ProductionAsie Int
+  // Capacité
+  capaciteUSA           Float
+  capaciteAsie          Float
+  // Couverture réseau
+  couvertureReseau      Float
+  equipe                Equipe @relation(fields: [equipeId], references: [id])
+  round                 Round  @relation(fields: [roundId], references: [id])
+
+  @@unique([equipeId, roundId])
+}
+
+model Financial {
+  id                    Int    @id @default(autoincrement())
+  equipeId              Int
+  roundId               Int
+  // Bilan Global - Actif
+  immobilisations       Float
+  stocks                Float
+  creancesClients       Float
+  tresorerie            Float
+  totalActif            Float
+  // Bilan Global - Passif (Capitaux Propres)
+  capitalSocial         Float
+  primeEmission         Float
+  resultatNet           Float
+  reportNouveau         Float
+  totalCapitauxPropres  Float
+  // Bilan Global - Passif (Dettes)
+  dettesLongTerme       Float
+  dettesCourtTerme      Float
+  detteFournisseurs     Float
+  totalDette            Float
+  equipe                Equipe @relation(fields: [equipeId], references: [id])
+  round                 Round  @relation(fields: [roundId], references: [id])
+
+  @@unique([equipeId, roundId])
+}
