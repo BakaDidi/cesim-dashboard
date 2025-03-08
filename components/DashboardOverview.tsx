@@ -13,7 +13,9 @@ import {
     ResponsiveContainer,
     LineChart,
     Line,
-
+    PieChart,
+    Pie,
+    Cell
 } from "recharts";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
@@ -144,6 +146,47 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
         };
     };
 
+    // Tooltips mis à jour pour le thème sombre
+    const customBarTooltip = ({ active, payload, label }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{label}</p>
+                <div className="mt-2 space-y-1">
+                    {payload.map((entry: any, index: number) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                            <span>
+                                {entry.name}: {formatCurrency(entry.value)}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    const customLineTooltip = ({ active, payload, label }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{label}</p>
+                <div className="mt-2 space-y-1">
+                    {payload.map((entry: any, index: number) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                            <span>
+                                {entry.name}: {formatPercent(entry.value)}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     if (isLoading) {
         return <LoadingSpinner />;
     }
@@ -172,7 +215,7 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                 <Card className="overflow-hidden">
                     <CardContent className="p-4">
                         <div className="space-y-1">
-                            <p className="text-sm text-gray-500">Revenu Global</p>
+                            <p className="text-sm text-muted-foreground">Revenu Global</p>
                             <div className="flex items-baseline justify-between">
                                 <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                     {formatCurrency(lastPerformance.revenuGlobal)}
@@ -188,7 +231,7 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                 <Card className="overflow-hidden">
                     <CardContent className="p-4">
                         <div className="space-y-1">
-                            <p className="text-sm text-gray-500">Bénéfice Net</p>
+                            <p className="text-sm text-muted-foreground">Bénéfice Net</p>
                             <div className="flex items-baseline justify-between">
                                 <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                     {formatCurrency(lastPerformance.beneficeNetGlobal)}
@@ -204,7 +247,7 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                 <Card className="overflow-hidden">
                     <CardContent className="p-4">
                         <div className="space-y-1">
-                            <p className="text-sm text-gray-500">Part de Marché</p>
+                            <p className="text-sm text-muted-foreground">Part de Marché</p>
                             <div className="flex items-baseline justify-between">
                                 <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                     {formatPercent(lastMarketShare.partMarcheGlobal)}
@@ -220,7 +263,7 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                 <Card className="overflow-hidden">
                     <CardContent className="p-4">
                         <div className="space-y-1">
-                            <p className="text-sm text-gray-500">Cours Action</p>
+                            <p className="text-sm text-muted-foreground">Cours Action</p>
                             <div className="flex items-baseline justify-between">
                                 <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                     {formatCurrency(lastPerformance.coursAction)}
@@ -242,10 +285,13 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                         <div className="h-64 sm:h-72 md:h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={performanceData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="round" />
-                                    <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`} />
-                                    <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <YAxis
+                                        tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
+                                        tick={{ fill: "hsl(var(--foreground))" }}
+                                    />
+                                    <Tooltip content={customBarTooltip} />
                                     <Legend wrapperStyle={{ fontSize: '12px' }} />
                                     <Bar dataKey="revenuGlobal" name="Revenu Global" fill="#4f46e5" />
                                     <Bar dataKey="beneficeNetGlobal" name="Bénéfice Net" fill="#22c55e" />
@@ -261,10 +307,14 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                         <div className="h-64 sm:h-72 md:h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={marketShareData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="round" />
-                                    <YAxis domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
-                                    <Tooltip formatter={(value) => formatPercent(Number(value))} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <YAxis
+                                        domain={[0, 'auto']}
+                                        tickFormatter={(value) => `${value}%`}
+                                        tick={{ fill: "hsl(var(--foreground))" }}
+                                    />
+                                    <Tooltip content={customLineTooltip} />
                                     <Legend wrapperStyle={{ fontSize: '12px' }} layout="horizontal" verticalAlign="bottom" align="center" />
                                     <Line type="monotone" dataKey="partMarcheGlobal" name="Part globale" stroke="#4f46e5" strokeWidth={2} />
                                     <Line type="monotone" dataKey="partTechno1Global" name="T1" stroke={COLORS[0]} />

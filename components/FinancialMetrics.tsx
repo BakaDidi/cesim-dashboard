@@ -101,8 +101,8 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
         fetchFinancials();
     }, [equipeId]);
 
-    const formatCurrency = (value: number) =>
-        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value);
+    const formatCurrency = (value: any) =>
+        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value ?? 0);
 
     const prepareBilanChartData = () => {
         return financials.map(f => ({
@@ -169,6 +169,44 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
         ];
     };
 
+    // Tooltips mis à jour pour le thème sombre
+    const customLineTooltip = ({ active, payload, label }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{label}</p>
+                <div className="mt-2 space-y-1">
+                    {payload
+                        .filter((p: any) => p.value !== undefined && p.value !== null)
+                        .map((entry: any, index: number) => (
+                            <div key={index} className="flex items-center gap-2">
+                                <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                                <span>
+                                    {entry.name}: {formatCurrency(entry.value)}
+                                </span>
+                            </div>
+                        ))}
+                </div>
+            </div>
+        );
+    };
+
+    const customPieTooltip = ({ active, payload }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        const data = payload[0];
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{data.name}</p>
+                <p className="mt-1">
+                    {formatCurrency(data.value)} ({(data.percent * 100).toFixed(1)}%)
+                </p>
+            </div>
+        );
+    };
+
     if (isLoading) {
         return <LoadingSpinner />;
     }
@@ -200,10 +238,13 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={bilanChartData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="round" />
-                                        <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`} />
-                                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <YAxis
+                                            tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                                            tick={{ fill: "hsl(var(--foreground))" }}
+                                        />
+                                        <Tooltip content={customLineTooltip} />
                                         <Legend />
                                         <Line type="monotone" dataKey="totalActif" name="Total Actif" stroke="#4f46e5" strokeWidth={2} />
                                         <Line type="monotone" dataKey="totalCapitauxPropres" name="Capitaux Propres" stroke="#22c55e" />
@@ -235,7 +276,7 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                            <Tooltip content={customPieTooltip} />
                                             <Legend />
                                         </PieChart>
                                     </ResponsiveContainer>
@@ -250,26 +291,26 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                                     {financials.length > 0 && (
                                         <>
                                             <div>
-                                                <p className="text-sm text-gray-500">Ratio d'autonomie financière</p>
+                                                <p className="text-sm text-muted-foreground">Ratio d'autonomie financière</p>
                                                 <p className="text-xl font-semibold">
                                                     {(financials[financials.length - 1].totalCapitauxPropres / financials[financials.length - 1].totalActif * 100).toFixed(2)}%
                                                 </p>
-                                                <p className="text-xs text-gray-400">Capitaux propres / Total actif</p>
+                                                <p className="text-xs text-muted-foreground">Capitaux propres / Total actif</p>
                                             </div>
                                             <div>
-                                                <p className="text-sm text-gray-500">Ratio d'endettement</p>
+                                                <p className="text-sm text-muted-foreground">Ratio d'endettement</p>
                                                 <p className="text-xl font-semibold">
                                                     {(financials[financials.length - 1].totalDette / financials[financials.length - 1].totalCapitauxPropres * 100).toFixed(2)}%
                                                 </p>
-                                                <p className="text-xs text-gray-400">Total dettes / Capitaux propres</p>
+                                                <p className="text-xs text-muted-foreground">Total dettes / Capitaux propres</p>
                                             </div>
                                             <div>
-                                                <p className="text-sm text-gray-500">Ratio de liquidité</p>
+                                                <p className="text-sm text-muted-foreground">Ratio de liquidité</p>
                                                 <p className="text-xl font-semibold">
                                                     {((financials[financials.length - 1].tresorerie + financials[financials.length - 1].creancesClients) /
                                                         (financials[financials.length - 1].dettesCourtTerme + financials[financials.length - 1].detteFournisseurs) || 0).toFixed(2)}
                                                 </p>
-                                                <p className="text-xs text-gray-400">(Trésorerie + Créances) / Dettes CT</p>
+                                                <p className="text-xs text-muted-foreground">(Trésorerie + Créances) / Dettes CT</p>
                                             </div>
                                         </>
                                     )}
@@ -288,17 +329,38 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={bilanChartData} stackOffset="expand">
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="round" />
-                                        <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <YAxis
+                                            tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+                                            tick={{ fill: "hsl(var(--foreground))" }}
+                                        />
                                         <Tooltip
-                                            formatter={(value, name) => [
-                                                formatCurrency(Number(value)),
-                                                name === "immobilisations" ? "Immobilisations" :
-                                                    name === "stocks" ? "Stocks" :
-                                                        name === "creancesClients" ? "Créances Clients" :
-                                                            "Trésorerie"
-                                            ]}
+                                            content={({ active, payload }) => {
+                                                if (!active || !payload || !payload.length) return null;
+
+                                                return (
+                                                    <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                                                        <p className="font-bold">{payload[0].payload.round}</p>
+                                                        <div className="mt-2 space-y-1">
+                                                            {payload.map((entry, index) => {
+                                                                const name = entry.name === "immobilisations" ? "Immobilisations" :
+                                                                    entry.name === "stocks" ? "Stocks" :
+                                                                        entry.name === "creancesClients" ? "Créances Clients" :
+                                                                            "Trésorerie";
+                                                                return (
+                                                                    <div key={index} className="flex items-center gap-2">
+                                                                        <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                                                                        <span>
+                                                                            {name}: {formatCurrency(entry.value)}
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }}
                                         />
                                         <Legend />
                                         <Bar dataKey="immobilisations" name="Immobilisations" stackId="a" fill={COLORS[0]} />
@@ -331,7 +393,7 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
-                                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                        <Tooltip content={customPieTooltip} />
                                         <Legend />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -349,14 +411,34 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={bilanChartData} stackOffset="expand">
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="round" />
-                                        <YAxis tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <YAxis
+                                            tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+                                            tick={{ fill: "hsl(var(--foreground))" }}
+                                        />
                                         <Tooltip
-                                            formatter={(value, name) => [
-                                                formatCurrency(Number(value)),
-                                                name === "totalCapitauxPropres" ? "Capitaux Propres" : "Dettes"
-                                            ]}
+                                            content={({ active, payload }) => {
+                                                if (!active || !payload || !payload.length) return null;
+
+                                                return (
+                                                    <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                                                        <p className="font-bold">{payload[0].payload.round}</p>
+                                                        <div className="mt-2 space-y-1">
+                                                            {payload.map((entry, index) => (
+                                                                <div key={index} className="flex items-center gap-2">
+                                                                    <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                                                                    <span>
+                                                                        {entry.name === "totalCapitauxPropres"
+                                                                            ? "Capitaux Propres"
+                                                                            : "Dettes"}: {formatCurrency(entry.value)}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }}
                                         />
                                         <Legend />
                                         <Bar dataKey="totalCapitauxPropres" name="Capitaux Propres" stackId="a" fill={COLORS[0]} />
@@ -387,7 +469,7 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
-                                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                        <Tooltip content={customPieTooltip} />
                                         <Legend />
                                     </PieChart>
                                 </ResponsiveContainer>

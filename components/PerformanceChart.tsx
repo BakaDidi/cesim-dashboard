@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     LineChart,
     Line,
@@ -138,6 +138,27 @@ export function PerformanceChart({ equipeId, detailed = false }: PerformanceChar
         }
     };
 
+    // Tooltip mis à jour pour le thème sombre
+    const customTooltip = ({ active, payload, label }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{label}</p>
+                <div className="mt-2 space-y-1">
+                    {payload.map((entry: any, index: number) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                            <span>
+                                {entry.name}: {formatCurrency(entry.value)}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     if (isLoading) {
         return <LoadingSpinner />;
     }
@@ -167,10 +188,13 @@ export function PerformanceChart({ equipeId, detailed = false }: PerformanceChar
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={chartData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="round" />
-                                        <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`} />
-                                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <YAxis
+                                            tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                                            tick={{ fill: "hsl(var(--foreground))" }}
+                                        />
+                                        <Tooltip content={customTooltip} />
                                         <Legend />
                                         <Bar dataKey="revenu" name="Revenus" fill="#4f46e5" />
                                     </BarChart>
@@ -185,10 +209,13 @@ export function PerformanceChart({ equipeId, detailed = false }: PerformanceChar
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={chartData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="round" />
-                                        <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} />
-                                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <YAxis
+                                            tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                                            tick={{ fill: "hsl(var(--foreground))" }}
+                                        />
+                                        <Tooltip content={customTooltip} />
                                         <Legend />
                                         <Bar dataKey="benefice" name="Bénéfice Net" fill="#22c55e" />
                                         <Bar dataKey="ebitda" name="EBITDA" fill="#6366f1" />
@@ -204,10 +231,13 @@ export function PerformanceChart({ equipeId, detailed = false }: PerformanceChar
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={chartData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="round" />
-                                        <YAxis domain={['auto', 'auto']} />
-                                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <YAxis
+                                            domain={['auto', 'auto']}
+                                            tick={{ fill: "hsl(var(--foreground))" }}
+                                        />
+                                        <Tooltip content={customTooltip} />
                                         <Legend />
                                         <Line type="monotone" dataKey="coursAction" name="Cours Action" stroke="#f97316" strokeWidth={2} dot={{ r: 6 }} />
                                     </LineChart>
@@ -219,11 +249,19 @@ export function PerformanceChart({ equipeId, detailed = false }: PerformanceChar
             ) : (
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="round" />
-                        <YAxis yAxisId="left" orientation="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                        <YAxis
+                            yAxisId="left"
+                            orientation="left"
+                            tick={{ fill: "hsl(var(--foreground))" }}
+                        />
+                        <YAxis
+                            yAxisId="right"
+                            orientation="right"
+                            tick={{ fill: "hsl(var(--foreground))" }}
+                        />
+                        <Tooltip content={customTooltip} />
                         <Legend />
                         <Line yAxisId="left" type="monotone" dataKey="revenu" name="Revenus" stroke="#4f46e5" activeDot={{ r: 8 }} />
                         <Line yAxisId="left" type="monotone" dataKey="benefice" name="Bénéfice Net" stroke="#22c55e" />

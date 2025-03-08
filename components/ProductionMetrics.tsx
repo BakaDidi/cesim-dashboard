@@ -144,6 +144,69 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
         return technoMix;
     };
 
+    // Tooltips mis à jour pour le thème sombre
+    const customBarTooltip = ({ active, payload, label }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{label}</p>
+                <div className="mt-2 space-y-1">
+                    {payload.map((entry: any, index: number) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                            <span>
+                                {entry.name}: {entry.value}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    const customLineTooltip = ({ active, payload, label }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{label}</p>
+                <div className="mt-2 space-y-1">
+                    {payload.map((entry: any, index: number) => {
+                        let formattedValue = entry.value;
+                        if (entry.dataKey === 'couvertureReseau') {
+                            formattedValue = `${entry.value}%`;
+                        }
+
+                        return (
+                            <div key={index} className="flex items-center gap-2">
+                                <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                                <span>
+                                    {entry.name}: {formattedValue}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
+
+    const customPieTooltip = ({ active, payload }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        const data = payload[0];
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{data.name}</p>
+                <p className="mt-1">
+                    Production: {data.value} unités ({(data.percent * 100).toFixed(1)}%)
+                </p>
+            </div>
+        );
+    };
+
     if (isLoading) {
         return <LoadingSpinner />;
     }
@@ -172,10 +235,10 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
                         <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={productionData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="round" />
-                                    <YAxis />
-                                    <Tooltip />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <YAxis tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <Tooltip content={customBarTooltip} />
                                     <Legend />
                                     <Bar dataKey="techno1" name="Techno 1" fill={COLORS[0]} />
                                     <Bar dataKey="techno2" name="Techno 2" fill={COLORS[1]} />
@@ -208,7 +271,7 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
-                                        <Tooltip />
+                                        <Tooltip content={customPieTooltip} />
                                         <Legend />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -222,10 +285,10 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={capacityData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="round" />
-                                        <YAxis />
-                                        <Tooltip />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <YAxis tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <Tooltip content={customLineTooltip} />
                                         <Legend />
                                         <Line type="monotone" dataKey="capaciteUSA" name="Capacité USA" stroke={COLORS[0]} />
                                         <Line type="monotone" dataKey="capaciteAsie" name="Capacité Asie" stroke={COLORS[1]} />
@@ -242,10 +305,14 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
                         <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={capacityData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="round" />
-                                    <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
-                                    <Tooltip formatter={(value) => `${value}%`} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <YAxis
+                                        domain={[0, 100]}
+                                        tickFormatter={(value) => `${value}%`}
+                                        tick={{ fill: "hsl(var(--foreground))" }}
+                                    />
+                                    <Tooltip content={customLineTooltip} />
                                     <Legend />
                                     <Line
                                         type="monotone"

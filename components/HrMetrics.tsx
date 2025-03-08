@@ -99,6 +99,39 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
         }));
     };
 
+    // Tooltips mis à jour pour le thème sombre
+    const customTooltip = ({ active, payload, label }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{label}</p>
+                <div className="mt-2 space-y-1">
+                    {payload.map((entry: any, index: number) => {
+                        let value: string;
+                        // Format en fonction du type de données
+                        if (entry.dataKey === 'tauxRotation') {
+                            value = formatPercent(entry.value);
+                        } else if (entry.dataKey === 'budgetFormation' || entry.dataKey === 'salairesMensuels') {
+                            value = formatCurrency(entry.value);
+                        } else {
+                            value = entry.value.toString();
+                        }
+
+                        return (
+                            <div key={index} className="flex items-center gap-2">
+                                <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                                <span>
+                                    {entry.name}: {value}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
+
     if (isLoading) {
         return <LoadingSpinner />;
     }
@@ -118,10 +151,10 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
                         <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={chartData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="round" />
-                                    <YAxis />
-                                    <Tooltip formatter={(value) => value} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <YAxis tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <Tooltip content={customTooltip} />
                                     <Legend />
                                     <Line
                                         type="monotone"
@@ -143,10 +176,14 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
                         <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={chartData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="round" />
-                                    <YAxis domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
-                                    <Tooltip formatter={(value) => formatPercent(Number(value))} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <YAxis
+                                        domain={[0, 'auto']}
+                                        tickFormatter={(value) => `${value}%`}
+                                        tick={{ fill: "hsl(var(--foreground))" }}
+                                    />
+                                    <Tooltip content={customTooltip} />
                                     <Legend />
                                     <Line
                                         type="monotone"
@@ -170,10 +207,10 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
                         <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="round" />
-                                    <YAxis />
-                                    <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <YAxis tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <Tooltip content={customTooltip} />
                                     <Legend />
                                     <Bar dataKey="budgetFormation" name="Budget formation" fill={COLORS[2]} />
                                 </BarChart>
@@ -188,10 +225,13 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
                         <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="round" />
-                                    <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} />
-                                    <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                    <YAxis
+                                        tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                                        tick={{ fill: "hsl(var(--foreground))" }}
+                                    />
+                                    <Tooltip content={customTooltip} />
                                     <Legend />
                                     <Bar dataKey="salairesMensuels" name="Salaires mensuels" fill={COLORS[3]} />
                                 </BarChart>
@@ -207,20 +247,20 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {hrData.length > 0 && (
                             <>
-                                <div className="p-4 bg-gray-50 rounded-lg">
-                                    <p className="text-sm text-gray-500">Employés R&D</p>
+                                <div className="p-4 bg-card rounded-lg border border-border">
+                                    <p className="text-sm text-muted-foreground">Employés R&D</p>
                                     <p className="text-2xl font-bold">{hrData[hrData.length - 1].employesRD}</p>
                                 </div>
-                                <div className="p-4 bg-gray-50 rounded-lg">
-                                    <p className="text-sm text-gray-500">Taux de rotation</p>
+                                <div className="p-4 bg-card rounded-lg border border-border">
+                                    <p className="text-sm text-muted-foreground">Taux de rotation</p>
                                     <p className="text-2xl font-bold">{hrData[hrData.length - 1].tauxRotation}%</p>
                                 </div>
-                                <div className="p-4 bg-gray-50 rounded-lg">
-                                    <p className="text-sm text-gray-500">Budget formation</p>
+                                <div className="p-4 bg-card rounded-lg border border-border">
+                                    <p className="text-sm text-muted-foreground">Budget formation</p>
                                     <p className="text-2xl font-bold">{formatCurrency(hrData[hrData.length - 1].budgetFormation)}</p>
                                 </div>
-                                <div className="p-4 bg-gray-50 rounded-lg">
-                                    <p className="text-sm text-gray-500">Salaire mensuel</p>
+                                <div className="p-4 bg-card rounded-lg border border-border">
+                                    <p className="text-sm text-muted-foreground">Salaire mensuel</p>
                                     <p className="text-2xl font-bold">{formatCurrency(hrData[hrData.length - 1].salairesMensuels)}</p>
                                 </div>
                             </>

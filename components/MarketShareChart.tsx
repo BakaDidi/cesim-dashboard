@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     LineChart,
     Line,
@@ -171,6 +171,42 @@ export function MarketShareChart({ equipeId, detailed = false }: MarketShareChar
         ].filter(item => item.value > 0); // Ne montrer que les technologies avec des parts de marché
     };
 
+    // Mise à jour des tooltips pour le thème sombre
+    const customLineTooltip = ({ active, payload, label }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{label}</p>
+                <div className="mt-2 space-y-1">
+                    {payload.map((entry: any, index: number) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                            <span>
+                                {entry.name}: {formatPercent(entry.value)}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    const customPieTooltip = ({ active, payload }: any) => {
+        if (!active || !payload || !payload.length) return null;
+
+        const data = payload[0];
+
+        return (
+            <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
+                <p className="font-bold">{data.name}</p>
+                <p className="mt-1">
+                    {formatPercent(data.value)} ({(data.percent * 100).toFixed(2)}%)
+                </p>
+            </div>
+        );
+    };
+
     if (isLoading) {
         return <LoadingSpinner />;
     }
@@ -201,10 +237,14 @@ export function MarketShareChart({ equipeId, detailed = false }: MarketShareChar
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={chartData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="round" />
-                                        <YAxis domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
-                                        <Tooltip formatter={(value) => formatPercent(Number(value))} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                        <YAxis
+                                            domain={[0, 'auto']}
+                                            tickFormatter={(value) => `${value}%`}
+                                            tick={{ fill: "hsl(var(--foreground))" }}
+                                        />
+                                        <Tooltip content={customLineTooltip} />
                                         <Legend />
                                         <Line type="monotone" dataKey="partMarche" name="Part de marché" stroke="#4f46e5" strokeWidth={2} />
                                     </LineChart>
@@ -234,7 +274,7 @@ export function MarketShareChart({ equipeId, detailed = false }: MarketShareChar
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip formatter={(value) => formatPercent(Number(value))} />
+                                            <Tooltip content={customPieTooltip} />
                                             <Legend />
                                         </PieChart>
                                     </ResponsiveContainer>
@@ -248,10 +288,13 @@ export function MarketShareChart({ equipeId, detailed = false }: MarketShareChar
                                 <div className="h-80">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart data={chartData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="round" />
-                                            <YAxis tickFormatter={(value) => `${value}%`} />
-                                            <Tooltip formatter={(value) => formatPercent(Number(value))} />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                            <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                                            <YAxis
+                                                tickFormatter={(value) => `${value}%`}
+                                                tick={{ fill: "hsl(var(--foreground))" }}
+                                            />
+                                            <Tooltip content={customLineTooltip} />
                                             <Legend />
                                             <Bar dataKey="partTechno1" name="Techno 1" fill={COLORS[0]} />
                                             <Bar dataKey="partTechno2" name="Techno 2" fill={COLORS[1]} />
@@ -267,10 +310,13 @@ export function MarketShareChart({ equipeId, detailed = false }: MarketShareChar
             ) : (
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="round" />
-                        <YAxis tickFormatter={(value) => `${value}%`} />
-                        <Tooltip formatter={(value) => formatPercent(Number(value))} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
+                        <YAxis
+                            tickFormatter={(value) => `${value}%`}
+                            tick={{ fill: "hsl(var(--foreground))" }}
+                        />
+                        <Tooltip content={customLineTooltip} />
                         <Legend />
                         <Line type="monotone" dataKey="partMarche" name="Part de marché" stroke="#4f46e5" />
                         <Line type="monotone" dataKey="partTechno1" name="Techno 1" stroke={COLORS[0]} />
