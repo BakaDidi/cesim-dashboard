@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     LineChart,
     Line,
@@ -75,7 +75,7 @@ export function PerformanceChart({ equipeId, detailed = false }: PerformanceChar
 
                 // Pour chaque round, récupérer les performances de l'équipe
                 const performancesData = await Promise.all(
-                    rounds.map(async (round) => {
+                    rounds.map(async (round: { id: number; nom: string }) => {
                         const response = await fetch(`/api/performances?roundId=${round.id}&equipe=${equipe.nom}`);
                         const data = await response.json();
                         return data.length > 0 ? data[0] : null;

@@ -1,4 +1,3 @@
-// app/api/rounds/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
@@ -62,11 +61,11 @@ export async function POST(request: NextRequest) {
       }
 
       // Trouver les données pour cette équipe
-      const performanceData = data.performances.find(p => p.equipe === equipeName);
-      const marketShareData = data.marketShares.find(m => m.equipe === equipeName);
-      const hrData = data.hrData.find(h => h.equipe === equipeName);
-      const productionData = data.productions.find(p => p.equipe === equipeName);
-      const financialData = data.financials.find(f => f.equipe === equipeName);
+      const performanceData = data.performances.find((p: any) => p.equipe === equipeName);
+      const marketShareData = data.marketShares.find((m: any) => m.equipe === equipeName);
+      const hrData = data.hrData.find((h: any) => h.equipe === equipeName);
+      const productionData = data.productions.find((p: any) => p.equipe === equipeName);
+      const financialData = data.financials.find((f: any) => f.equipe === equipeName);
 
       // Créer les entrées dans la base de données
       if (performanceData) {
@@ -234,12 +233,12 @@ export async function GET() {
     // 3. Filtrer manuellement pour trouver les données de l'équipe
     const formattedRounds = rounds.map(round => {
       // Trouver les performances pour mon équipe
-      const performance = round.performances.find(p =>
+      const performance = round.performances.find((p: any) =>
           monEquipe && p.equipeId === monEquipe.id
       );
 
       // Trouver les parts de marché pour mon équipe
-      const marketShare = round.marketShares.find(ms =>
+      const marketShare = round.marketShares.find((ms: any) =>
           monEquipe && ms.equipeId === monEquipe.id
       );
 

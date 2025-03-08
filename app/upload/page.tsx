@@ -1,7 +1,7 @@
 // app/upload/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,13 @@ export default function UploadPage() {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const { toast } = useToast();
+
+    // Initialiser la date à la date actuelle au chargement du composant
+    useEffect(() => {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0]; // Format YYYY-MM-DD
+        setRoundDate(formattedDate);
+    }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -105,8 +112,7 @@ export default function UploadPage() {
     };
 
     return (
-        <div className="container py-10">
-            <h1 className="text-3xl font-bold mb-6">Upload de Données CESIM</h1>
+        <div className="container">
 
             <Card>
                 <CardHeader>
@@ -134,7 +140,11 @@ export default function UploadPage() {
                                 value={roundDate}
                                 onChange={(e) => setRoundDate(e.target.value)}
                                 required
+                                disabled
                             />
+                            <p className="text-sm text-gray-500">
+                                Date automatiquement définie à aujourd'hui
+                            </p>
                         </div>
 
                         <div className="space-y-2">

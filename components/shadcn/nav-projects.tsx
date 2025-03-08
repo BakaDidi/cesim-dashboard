@@ -15,15 +15,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
 import {
     SidebarGroup,
     SidebarGroupLabel,
     SidebarMenu,
+    SidebarMenuItem,
     SidebarMenuAction,
     SidebarMenuButton,
-    SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar"
+
 
 export function NavProjects({
                                 projects,

@@ -28,6 +28,7 @@ export async function parseExcelRound(fileData: Uint8Array): Promise<RoundData> 
     // Charger le workbook
     const workbook = XLSX.read(fileData, {
         cellStyles: true,
+        // @ts-ignore
         cellFormulas: true,
         cellDates: true,
         cellNF: true,

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     LineChart,
     Line,
@@ -86,7 +86,7 @@ export function MarketShareChart({ equipeId, detailed = false }: MarketShareChar
 
                 // Pour chaque round, récupérer les parts de marché de l'équipe
                 const marketSharesData = await Promise.all(
-                    rounds.map(async (round) => {
+                    rounds.map(async (round: { id: any; }) => {
                         const response = await fetch(`/api/market-shares?roundId=${round.id}&equipe=${equipe.nom}`);
                         const data = await response.json();
                         return data.length > 0 ? data[0] : null;

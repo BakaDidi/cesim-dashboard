@@ -72,7 +72,7 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
 
                 // Pour chaque round, récupérer les données de production de l'équipe
                 const productionsData = await Promise.all(
-                    rounds.map(async (round) => {
+                    rounds.map(async (round: { id: any; }) => {
                         const response = await fetch(`/api/productions?roundId=${round.id}&equipe=${equipe.nom}`);
                         const data = await response.json();
                         return data.length > 0 ? data[0] : null;

@@ -50,7 +50,7 @@ export default function RoundDetailPage() {
                 setEquipes(equipesData);
 
                 // Définir l'équipe par défaut (mon équipe)
-                const monEquipe = equipesData.find(e => e.estMonEquipe);
+                const monEquipe = equipesData.find((e: { estMonEquipe: any; }) => e.estMonEquipe);
                 if (monEquipe) {
                     setSelectedEquipe(monEquipe.id.toString());
                 } else if (equipesData.length > 0) {

@@ -13,9 +13,7 @@ import {
     ResponsiveContainer,
     LineChart,
     Line,
-    PieChart,
-    Pie,
-    Cell
+
 } from "recharts";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
@@ -51,9 +49,8 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                     return;
                 }
 
-                // Pour chaque round, récupérer les performances et parts de marché
                 const performanceData = await Promise.all(
-                    rounds.map(async (round) => {
+                    rounds.map(async (round: { id: any; }) => {
                         const response = await fetch(`/api/performances?roundId=${round.id}&equipe=${equipe.nom}`);
                         const data = await response.json();
                         return data.length > 0 ? data[0] : null;
@@ -61,7 +58,7 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                 );
 
                 const marketShareData = await Promise.all(
-                    rounds.map(async (round) => {
+                    rounds.map(async (round: { id: any; }) => {
                         const response = await fetch(`/api/market-shares?roundId=${round.id}&equipe=${equipe.nom}`);
                         const data = await response.json();
                         return data.length > 0 ? data[0] : null;
@@ -169,18 +166,18 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
     const stockPriceChange = getPerformanceChange('coursAction');
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full overflow-hidden">
             {/* KPIs */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card>
-                    <CardContent className="p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="overflow-hidden">
+                    <CardContent className="p-4">
                         <div className="space-y-1">
                             <p className="text-sm text-gray-500">Revenu Global</p>
                             <div className="flex items-baseline justify-between">
-                                <div className="text-2xl font-bold">
+                                <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                     {formatCurrency(lastPerformance.revenuGlobal)}
                                 </div>
-                                <div className={`text-sm font-medium ${revenueChange.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className={`text-xs sm:text-sm font-medium ${revenueChange.isPositive ? 'text-green-500' : 'text-red-500'}`}>
                                     {revenueChange.isPositive ? '+' : '-'}{revenueChange.value}%
                                 </div>
                             </div>
@@ -188,15 +185,15 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardContent className="p-6">
+                <Card className="overflow-hidden">
+                    <CardContent className="p-4">
                         <div className="space-y-1">
                             <p className="text-sm text-gray-500">Bénéfice Net</p>
                             <div className="flex items-baseline justify-between">
-                                <div className="text-2xl font-bold">
+                                <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                     {formatCurrency(lastPerformance.beneficeNetGlobal)}
                                 </div>
-                                <div className={`text-sm font-medium ${profitChange.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className={`text-xs sm:text-sm font-medium ${profitChange.isPositive ? 'text-green-500' : 'text-red-500'}`}>
                                     {profitChange.isPositive ? '+' : '-'}{profitChange.value}%
                                 </div>
                             </div>
@@ -204,15 +201,15 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardContent className="p-6">
+                <Card className="overflow-hidden">
+                    <CardContent className="p-4">
                         <div className="space-y-1">
                             <p className="text-sm text-gray-500">Part de Marché</p>
                             <div className="flex items-baseline justify-between">
-                                <div className="text-2xl font-bold">
+                                <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                     {formatPercent(lastMarketShare.partMarcheGlobal)}
                                 </div>
-                                <div className={`text-sm font-medium ${marketShareChange.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className={`text-xs sm:text-sm font-medium ${marketShareChange.isPositive ? 'text-green-500' : 'text-red-500'}`}>
                                     {marketShareChange.isPositive ? '+' : '-'}{marketShareChange.value}%
                                 </div>
                             </div>
@@ -220,15 +217,15 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardContent className="p-6">
+                <Card className="overflow-hidden">
+                    <CardContent className="p-4">
                         <div className="space-y-1">
                             <p className="text-sm text-gray-500">Cours Action</p>
                             <div className="flex items-baseline justify-between">
-                                <div className="text-2xl font-bold">
+                                <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate">
                                     {formatCurrency(lastPerformance.coursAction)}
                                 </div>
-                                <div className={`text-sm font-medium ${stockPriceChange.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className={`text-xs sm:text-sm font-medium ${stockPriceChange.isPositive ? 'text-green-500' : 'text-red-500'}`}>
                                     {stockPriceChange.isPositive ? '+' : '-'}{stockPriceChange.value}%
                                 </div>
                             </div>
@@ -238,18 +235,18 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
             </div>
 
             {/* Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                    <CardContent className="pt-6">
-                        <h3 className="text-lg font-medium mb-4">Évolution des revenus et bénéfices</h3>
-                        <div className="h-80">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="overflow-hidden">
+                    <CardContent className="pt-4">
+                        <h3 className="text-lg font-medium mb-2">Évolution des revenus et bénéfices</h3>
+                        <div className="h-64 sm:h-72 md:h-80">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={performanceData}>
+                                <BarChart data={performanceData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="round" />
-                                    <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`} />
+                                    <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`} />
                                     <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                                    <Legend />
+                                    <Legend wrapperStyle={{ fontSize: '12px' }} />
                                     <Bar dataKey="revenuGlobal" name="Revenu Global" fill="#4f46e5" />
                                     <Bar dataKey="beneficeNetGlobal" name="Bénéfice Net" fill="#22c55e" />
                                 </BarChart>
@@ -258,22 +255,22 @@ export function DashboardOverview({ equipeId }: DashboardOverviewProps) {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardContent className="pt-6">
-                        <h3 className="text-lg font-medium mb-4">Parts de marché</h3>
-                        <div className="h-80">
+                <Card className="overflow-hidden">
+                    <CardContent className="pt-4">
+                        <h3 className="text-lg font-medium mb-2">Parts de marché</h3>
+                        <div className="h-64 sm:h-72 md:h-80">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={marketShareData}>
+                                <LineChart data={marketShareData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="round" />
                                     <YAxis domain={[0, 'auto']} tickFormatter={(value) => `${value}%`} />
                                     <Tooltip formatter={(value) => formatPercent(Number(value))} />
-                                    <Legend />
-                                    <Line type="monotone" dataKey="partMarcheGlobal" name="Part de marché globale" stroke="#4f46e5" strokeWidth={2} />
-                                    <Line type="monotone" dataKey="partTechno1Global" name="Techno 1" stroke={COLORS[0]} />
-                                    <Line type="monotone" dataKey="partTechno2Global" name="Techno 2" stroke={COLORS[1]} />
-                                    <Line type="monotone" dataKey="partTechno3Global" name="Techno 3" stroke={COLORS[2]} />
-                                    <Line type="monotone" dataKey="partTechno4Global" name="Techno 4" stroke={COLORS[3]} />
+                                    <Legend wrapperStyle={{ fontSize: '12px' }} layout="horizontal" verticalAlign="bottom" align="center" />
+                                    <Line type="monotone" dataKey="partMarcheGlobal" name="Part globale" stroke="#4f46e5" strokeWidth={2} />
+                                    <Line type="monotone" dataKey="partTechno1Global" name="T1" stroke={COLORS[0]} />
+                                    <Line type="monotone" dataKey="partTechno2Global" name="T2" stroke={COLORS[1]} />
+                                    <Line type="monotone" dataKey="partTechno3Global" name="T3" stroke={COLORS[2]} />
+                                    <Line type="monotone" dataKey="partTechno4Global" name="T4" stroke={COLORS[3]} />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>

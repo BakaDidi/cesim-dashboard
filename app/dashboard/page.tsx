@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RoundsTable } from "@/components/RoundsTable";
@@ -10,43 +10,31 @@ import { FinancialMetrics } from "@/components/FinancialMetrics";
 import { HrMetrics } from "@/components/HrMetrics";
 import { ProductionMetrics } from "@/components/ProductionMetrics";
 import { DashboardOverview } from "@/components/DashboardOverview";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { EquipeContext } from "@/app/layout"; // Import du contexte d'équipe
 
 export default function DashboardPage() {
     const [rounds, setRounds] = useState([]);
-    const [equipes, setEquipes] = useState([]);
-    const [selectedEquipe, setSelectedEquipe] = useState("");
     const [isLoading, setIsLoading] = useState(true);
 
+    // Utilisation du contexte d'équipe
+    const { selectedEquipe } = useContext(EquipeContext);
+
     useEffect(() => {
-        const fetchInitialData = async () => {
+        const fetchRounds = async () => {
             try {
                 // Charger les rounds
                 const roundsResponse = await fetch("/api/rounds");
                 const roundsData = await roundsResponse.json();
                 setRounds(roundsData);
-
-                // Charger les équipes
-                const equipesResponse = await fetch("/api/equipes");
-                const equipesData = await equipesResponse.json();
-                setEquipes(equipesData);
-
-                // Définir l'équipe par défaut (mon équipe)
-                const monEquipe = equipesData.find(e => e.estMonEquipe);
-                if (monEquipe) {
-                    setSelectedEquipe(monEquipe.id.toString());
-                } else if (equipesData.length > 0) {
-                    setSelectedEquipe(equipesData[0].id.toString());
-                }
             } catch (error) {
-                console.error("Erreur lors du chargement des données initiales:", error);
+                console.error("Erreur lors du chargement des rounds:", error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchInitialData();
+        fetchRounds();
     }, []);
 
     if (isLoading) {
@@ -54,33 +42,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold">Dashboard CESIM</h1>
-                <div className="flex items-center gap-4">
-                    <span>Équipe:</span>
-                    <Select
-                        value={selectedEquipe}
-                        onValueChange={setSelectedEquipe}
-                    >
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Sélectionner une équipe" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {equipes.map((equipe) => (
-                                <SelectItem
-                                    key={equipe.id}
-                                    value={equipe.id.toString()}
-                                    className={equipe.estMonEquipe ? "font-bold" : ""}
-                                >
-                                    {equipe.nom} {equipe.estMonEquipe ? "(Ma team)" : ""}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-
+        <div className="w-full">
             <Tabs defaultValue="overview">
                 <TabsList className="grid w-full grid-cols-6">
                     <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>

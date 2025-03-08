@@ -78,7 +78,7 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
 
                 // Pour chaque round, récupérer les données financières de l'équipe
                 const financialsData = await Promise.all(
-                    rounds.map(async (round) => {
+                    rounds.map(async (round: { id: any; }) => {
                         const response = await fetch(`/api/financials?roundId=${round.id}&equipe=${equipe.nom}`);
                         const data = await response.json();
                         return data.length > 0 ? data[0] : null;

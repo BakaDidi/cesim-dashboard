@@ -146,19 +146,8 @@ export function RoundsTable() {
         }).format(num / 100);
     };
 
-    // Formatage des dates
-    const formatDate = (dateString: string) => {
-        if (!dateString) return "N/A";
-        const options: Intl.DateTimeFormatOptions = {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        };
-        return new Date(dateString).toLocaleDateString('fr-FR', options);
-    };
-
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full overflow-hidden">
             <div className="flex items-center justify-between">
                 <Input
                     placeholder="Rechercher un tour..."
@@ -167,7 +156,7 @@ export function RoundsTable() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -184,27 +173,17 @@ export function RoundsTable() {
                             <TableHead>
                                 <Button
                                     variant="ghost"
-                                    className="p-0 hover:bg-transparent"
-                                    onClick={() => handleSort("date")}
-                                >
-                                    <span>Date</span>
-                                    {getSortIcon("date")}
-                                </Button>
-                            </TableHead>
-                            <TableHead>
-                                <Button
-                                    variant="ghost"
-                                    className="p-0 hover:bg-transparent"
+                                    className="p-0 hover:bg-transparent whitespace-nowrap"
                                     onClick={() => handleSort("revenuEurope")}
                                 >
-                                    <span>Revenu Europe</span>
+                                    <span>Revenu EU</span>
                                     {getSortIcon("revenuEurope")}
                                 </Button>
                             </TableHead>
                             <TableHead>
                                 <Button
                                     variant="ghost"
-                                    className="p-0 hover:bg-transparent"
+                                    className="p-0 hover:bg-transparent whitespace-nowrap"
                                     onClick={() => handleSort("revenuGlobal")}
                                 >
                                     <span>Revenu Global</span>
@@ -214,17 +193,17 @@ export function RoundsTable() {
                             <TableHead>
                                 <Button
                                     variant="ghost"
-                                    className="p-0 hover:bg-transparent"
+                                    className="p-0 hover:bg-transparent whitespace-nowrap"
                                     onClick={() => handleSort("beneficeEurope")}
                                 >
-                                    <span>Bénéfice Europe</span>
+                                    <span>Bénéfice EU</span>
                                     {getSortIcon("beneficeEurope")}
                                 </Button>
                             </TableHead>
                             <TableHead>
                                 <Button
                                     variant="ghost"
-                                    className="p-0 hover:bg-transparent"
+                                    className="p-0 hover:bg-transparent whitespace-nowrap"
                                     onClick={() => handleSort("beneficeGlobal")}
                                 >
                                     <span>Bénéfice Global</span>
@@ -234,27 +213,26 @@ export function RoundsTable() {
                             <TableHead>
                                 <Button
                                     variant="ghost"
-                                    className="p-0 hover:bg-transparent"
+                                    className="p-0 hover:bg-transparent whitespace-nowrap"
                                     onClick={() => handleSort("partMarche")}
                                 >
-                                    <span>Part de Marché</span>
+                                    <span>Part Marché</span>
                                     {getSortIcon("partMarche")}
                                 </Button>
                             </TableHead>
-                            <TableHead>Commentaires</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={9} className="text-center py-4">
+                                <TableCell colSpan={7} className="text-center py-4">
                                     <LoadingSpinner />
                                 </TableCell>
                             </TableRow>
                         ) : sortedRounds.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={9} className="text-center py-4">
+                                <TableCell colSpan={7} className="text-center py-4">
                                     Aucun tour trouvé
                                 </TableCell>
                             </TableRow>
@@ -262,13 +240,11 @@ export function RoundsTable() {
                             sortedRounds.map((round) => (
                                 <TableRow key={round.id}>
                                     <TableCell className="font-medium">{round.numero}</TableCell>
-                                    <TableCell>{formatDate(round.date)}</TableCell>
                                     <TableCell>{formatNumber(round.performance?.revenuEurope)}</TableCell>
                                     <TableCell>{formatNumber(round.performance?.revenuGlobal)}</TableCell>
                                     <TableCell>{formatNumber(round.performance?.beneficeNetEurope)}</TableCell>
                                     <TableCell>{formatNumber(round.performance?.beneficeNetGlobal)}</TableCell>
                                     <TableCell>{formatPercent(round.marketShare?.partMarcheEurope)}</TableCell>
-                                    <TableCell className="max-w-[200px] truncate">{round.commentaires || 'N/A'}</TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>

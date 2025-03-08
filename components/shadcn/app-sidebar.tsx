@@ -1,175 +1,92 @@
 "use client"
 
 import * as React from "react"
+import { useContext, useMemo, useCallback } from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
+    Bot,
+    GalleryVerticalEnd,
+    PieChart,
+    BarChart3,
 } from "lucide-react"
 
 import { NavMain } from "@/components/shadcn/nav-main"
-import { NavProjects } from "@/components/shadcn/nav-projects"
-import { NavUser } from "@/components/shadcn/nav-user"
-import { TeamSwitcher } from "@/components/shadcn/team-switcher"
+import { EquipeContext } from "@/app/layout" // Import du contexte
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
+    Sidebar,
+    SidebarContent,
+    SidebarHeader,
+    SidebarRail,
 } from "@/components/ui/sidebar"
+import { CesimTeamSwitcher } from "@/components/shadcn/cesim-team-switcher"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
+// Mise à jour des items de navigation avec la nouvelle page de comparaison
+const navMainItems = [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: PieChart,
     },
     {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
+        title: "Comparaison",
+        url: "/compare",
+        icon: BarChart3,
     },
     {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
+        title: "Upload",
+        url: "/upload",
+        icon: Bot,
     },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+];
+
+function AppSidebarComponent({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { selectedEquipe, setSelectedEquipe, equipes } = useContext(EquipeContext);
+
+    // Sample data for non-team related UI - moved outside render function
+    const data = useMemo(() => ({
+        navMain: navMainItems,
+    }), []);
+
+    // Memoize the handler to prevent recreating it on each render
+    const handleEquipeChange = useCallback((equipeId: string) => {
+        setSelectedEquipe(equipeId);
+    }, [setSelectedEquipe]);
+
+    // Memoize the active equipe calculation
+    const activeEquipe = useMemo(() =>
+            equipes.find(eq => eq.id.toString() === selectedEquipe),
+        [equipes, selectedEquipe]
+    );
+
+    // Memoize the teams data transformation
+    const teamsData = useMemo(() =>
+            equipes.map(equipe => ({
+                id: equipe.id.toString(),
+                name: equipe.nom,
+                logo: GalleryVerticalEnd,
+                plan: equipe.estMonEquipe ? "Ma team" : "Équipe",
+                estMonEquipe: equipe.estMonEquipe
+            })),
+        [equipes]
+    );
+
+    return (
+        <Sidebar collapsible="icon" {...props}>
+            <SidebarHeader>
+                {/* Affiche le TeamSwitcher uniquement quand les équipes sont chargées */}
+                {equipes.length > 0 && activeEquipe && (
+                    <CesimTeamSwitcher
+                        teams={teamsData}
+                        activeTeam={activeEquipe.id.toString()}
+                        onTeamChange={handleEquipeChange}
+                    />
+                )}
+            </SidebarHeader>
+            <SidebarContent>
+                <NavMain items={data.navMain} />
+            </SidebarContent>
+            <SidebarRail />
+        </Sidebar>
+    );
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  return (
-      <Sidebar collapsible="icon" {...props}>
-        <SidebarHeader>
-          <TeamSwitcher teams={data.teams} />
-        </SidebarHeader>
-        <SidebarContent>
-          <NavMain items={data.navMain} />
-          <NavProjects projects={data.projects} />
-        </SidebarContent>
-        <SidebarFooter>
-          <NavUser user={data.user} />
-        </SidebarFooter>
-        <SidebarRail />
-      </Sidebar>
-  )
-}
+export const AppSidebar = React.memo(AppSidebarComponent);
