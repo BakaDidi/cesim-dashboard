@@ -201,7 +201,7 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
             <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
                 <p className="font-bold">{data.name}</p>
                 <p className="mt-1">
-                    {formatCurrency(data.value)} ({(data.percent * 100).toFixed(1)}%)
+                    {formatCurrency(data.value)}
                 </p>
             </div>
         );

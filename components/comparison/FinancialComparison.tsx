@@ -377,7 +377,7 @@ export function FinancialComparison({ equipes }: FinancialComparisonProps) {
                                     className={`text-sm ${equipe.estMonEquipe ? 'font-bold' : ''}`}
                                 >
                                     {equipe.nom}
-                                    {equipe.estMonEquipe && <span className="ml-1 text-xs">(Ma team)</span>}
+                                    {equipe.estMonEquipe && <span className="ml-1 text-xs">(Mon équipe)</span>}
                                 </Label>
                             </div>
                         ))}

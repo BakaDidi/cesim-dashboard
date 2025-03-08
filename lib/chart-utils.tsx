@@ -80,7 +80,7 @@ export const GenericBarTooltip: React.FC<ChartTooltipProps> = ({
     return (
         <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
         <p className={`font-medium ${isHighlighted ? 'font-bold' : ''}`}>
-    {data.equipe} {isHighlighted ? '(Ma team)' : ''}
+    {data.equipe} {isHighlighted ? '(Mon Equipe)' : ''}
     </p>
     <p className="mt-1">
     <span className="font-bold">{formatter(data.value)}</span>

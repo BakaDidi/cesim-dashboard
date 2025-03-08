@@ -22,12 +22,18 @@ interface RankingTableProps {
 type MetricOptionsByCategory = {
     [key: string]: MetricOption[];
 };
-
+function logRankings(rankings: RankingItem[]) {
+    rankings.forEach((ranking, index) => {
+        console.log(`ranking ${index + 1}:`, ranking);
+    });
+}
 export function RankingTable({ equipes, category }: RankingTableProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [rankings, setRankings] = useState<RankingItem[]>([]);
     const [metric, setMetric] = useState("");
     const [lastRound, setLastRound] = useState<number | null>(null);
+
+    logRankings(rankings);
 
     // Options de métriques par catégorie
     const metricOptions: MetricOptionsByCategory = {
@@ -46,7 +52,6 @@ export function RankingTable({ equipes, category }: RankingTableProps) {
         production: [
             { value: "capaciteUSA", label: "Capacité USA" },
             { value: "capaciteAsie", label: "Capacité Asie" },
-            { value: "couvertureReseau", label: "Couverture Réseau" },
         ],
         financials: [
             { value: "totalActif", label: "Total Actif" },
@@ -234,7 +239,7 @@ export function RankingTable({ equipes, category }: RankingTableProps) {
                                     <div className="flex items-center">
                                         <span>{item.equipeNom}</span>
                                         {item.estMonEquipe && (
-                                            <Badge variant="secondary" className="ml-2">Mon équipe</Badge>
+                                            <Badge variant="default" className="ml-2">Mon équipe</Badge>
                                         )}
                                     </div>
                                 </TableCell>

@@ -262,7 +262,7 @@ export function HrComparison({ equipes }: HrComparisonProps) {
         return (
             <div className="bg-background border rounded p-3 shadow-lg">
                 <p className={`font-medium ${data.estMonEquipe ? 'font-bold' : ''}`}>
-                    {data.equipe} {data.estMonEquipe ? '(Ma team)' : ''}
+                    {data.equipe} {data.estMonEquipe ? '(Mon équipe)' : ''}
                 </p>
                 <p className="mt-1">
                     <span className="font-bold">{formatValue(data.value)}</span>
@@ -295,23 +295,6 @@ export function HrComparison({ equipes }: HrComparisonProps) {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div>
-                            <Label>Vue</Label>
-                            <div className="flex rounded-md border">
-                                <button
-                                    className={`px-3 py-1.5 text-sm ${view === 'evolution' ? 'bg-primary text-primary-foreground' : 'bg-transparent'}`}
-                                    onClick={() => handleViewChange('evolution')}
-                                >
-                                    Évolution
-                                </button>
-                                <button
-                                    className={`px-3 py-1.5 text-sm ${view === 'latest' ? 'bg-primary text-primary-foreground' : 'bg-transparent'}`}
-                                    onClick={() => handleViewChange('latest')}
-                                >
-                                    Dernier round
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -339,7 +322,7 @@ export function HrComparison({ equipes }: HrComparisonProps) {
                                     className={`text-sm ${equipe.estMonEquipe ? 'font-bold' : ''}`}
                                 >
                                     {equipe.nom}
-                                    {equipe.estMonEquipe && <span className="ml-1 text-xs">(Ma team)</span>}
+                                    {equipe.estMonEquipe && <span className="ml-1 text-xs">(Mon équipe)</span>}
                                 </Label>
                             </div>
                         ))}

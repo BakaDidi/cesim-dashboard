@@ -1,24 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {useEffect, useState} from "react";
+import {Card, CardContent} from "@/components/ui/card";
+import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {
-    BarChart,
     Bar,
-    XAxis,
-    YAxis,
+    BarChart,
     CartesianGrid,
-    Tooltip,
+    Cell,
     Legend,
-    ResponsiveContainer,
-    LineChart,
     Line,
-    PieChart,
+    LineChart,
     Pie,
-    Cell
+    PieChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
 } from "recharts";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import {LoadingSpinner} from "@/components/LoadingSpinner";
 
 interface Production {
     id: number;
@@ -122,7 +122,9 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
         // Utiliser les dernières données disponibles
         const latestData = productions[productions.length - 1];
 
-        const technoMix = [
+
+         // Ne montrer que les technologies avec une production
+        return [
             {
                 name: "Techno 1",
                 value: region === "usa" ? latestData.techno1ProductionUSA : latestData.techno1ProductionAsie
@@ -139,9 +141,7 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
                 name: "Techno 4",
                 value: region === "usa" ? latestData.techno4ProductionUSA : latestData.techno4ProductionAsie
             }
-        ].filter(item => item.value > 0); // Ne montrer que les technologies avec une production
-
-        return technoMix;
+        ].filter(item => item.value > 0);
     };
 
     // Tooltips mis à jour pour le thème sombre
@@ -201,7 +201,7 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
             <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
                 <p className="font-bold">{data.name}</p>
                 <p className="mt-1">
-                    Production: {data.value} unités ({(data.percent * 100).toFixed(1)}%)
+                    Production: {data.value} unités
                 </p>
             </div>
         );
@@ -299,33 +299,6 @@ export function ProductionMetrics({ equipeId }: ProductionMetricsProps) {
                     </Card>
                 </div>
 
-                <Card>
-                    <CardContent className="pt-6">
-                        <h3 className="text-lg font-medium mb-4">Couverture réseau</h3>
-                        <div className="h-80">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={capacityData}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                                    <XAxis dataKey="round" tick={{ fill: "hsl(var(--foreground))" }} />
-                                    <YAxis
-                                        domain={[0, 100]}
-                                        tickFormatter={(value) => `${value}%`}
-                                        tick={{ fill: "hsl(var(--foreground))" }}
-                                    />
-                                    <Tooltip content={customLineTooltip} />
-                                    <Legend />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="couvertureReseau"
-                                        name="Couverture Réseau"
-                                        stroke="#8884d8"
-                                        strokeWidth={2}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </CardContent>
-                </Card>
             </div>
         </div>
     );

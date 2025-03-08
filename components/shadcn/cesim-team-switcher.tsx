@@ -53,7 +53,7 @@ const MemoizedDropdownMenuItem = memo(({
             <div className="flex size-6 items-center justify-center rounded-sm border">
                 <Users className="size-4 shrink-0" />
             </div>
-            {team.name} {team.estMonEquipe ? "(Ma team)" : ""}
+            {team.name} {team.estMonEquipe ? "(Mon Equipe)" : ""}
             {index < 9 && (
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
             )}

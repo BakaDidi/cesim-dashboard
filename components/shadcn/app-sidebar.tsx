@@ -63,7 +63,7 @@ function AppSidebarComponent({ ...props }: React.ComponentProps<typeof Sidebar>)
                 id: equipe.id.toString(),
                 name: equipe.nom,
                 logo: GalleryVerticalEnd,
-                plan: equipe.estMonEquipe ? "Ma team" : "Équipe",
+                plan: equipe.estMonEquipe ? "Mon équipe" : "Équipe",
                 estMonEquipe: equipe.estMonEquipe
             })),
         [equipes]

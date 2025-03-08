@@ -257,7 +257,7 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
         return (
             <div className="bg-background border rounded p-3 shadow-lg">
                 <p className={`font-medium ${data.estMonEquipe ? 'font-bold' : ''}`}>
-                    {data.equipe} {data.estMonEquipe ? '(Ma team)' : ''}
+                    {data.equipe} {data.estMonEquipe ? '(Mon équipe)' : ''}
                 </p>
                 <p className="mt-1">
                     <span className="font-bold">{formatPercent(data.value)}</span>
@@ -354,7 +354,7 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
                                         className={`text-sm ${equipe.estMonEquipe ? 'font-bold' : ''}`}
                                     >
                                         {equipe.nom}
-                                        {equipe.estMonEquipe && <span className="ml-1 text-xs">(Ma team)</span>}
+                                        {equipe.estMonEquipe && <span className="ml-1 text-xs">(Mon équipe)</span>}
                                     </Label>
                                 </div>
                             ))}

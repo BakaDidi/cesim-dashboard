@@ -51,7 +51,6 @@ export function ProductionComparison({ equipes }: ProductionComparisonProps) {
         { value: "techno2Production", label: "Production Techno 2" },
         { value: "techno3Production", label: "Production Techno 3" },
         { value: "techno4Production", label: "Production Techno 4" },
-        { value: "couvertureReseau", label: "Couverture Réseau" }
     ];
 
     useEffect(() => {
@@ -132,8 +131,6 @@ export function ProductionComparison({ equipes }: ProductionComparisonProps) {
                     if (metric === "capacite") {
                         const key = `capacite${region}` as keyof Production;
                         value = prod[key] as number;
-                    } else if (metric === "couvertureReseau") {
-                        value = prod.couvertureReseau;
                     } else {
                         // Métriques de production par technologie (techno1Production, techno2Production, etc.)
                         const key = `${metric}${region}` as keyof Production;
@@ -174,9 +171,6 @@ export function ProductionComparison({ equipes }: ProductionComparisonProps) {
     const formatValue = (value: number | undefined) => {
         if (value === undefined || value === null) return "N/A";
 
-        if (metric === "couvertureReseau") {
-            return `${value.toFixed(2)}%`;
-        }
 
         return value.toLocaleString('fr-FR');
     };
@@ -234,7 +228,7 @@ export function ProductionComparison({ equipes }: ProductionComparisonProps) {
                             </Select>
                         </div>
 
-                        {metric !== "couvertureReseau" && (
+                        {metric && (
                             <div>
                                 <Label>Région</Label>
                                 <Tabs value={region} onValueChange={setRegion}>
@@ -272,7 +266,7 @@ export function ProductionComparison({ equipes }: ProductionComparisonProps) {
                                     className={`text-sm ${equipe.estMonEquipe ? 'font-bold' : ''}`}
                                 >
                                     {equipe.nom}
-                                    {equipe.estMonEquipe && <span className="ml-1 text-xs">(Ma team)</span>}
+                                    {equipe.estMonEquipe && <span className="ml-1 text-xs">(Mon équipe)</span>}
                                 </Label>
                             </div>
                         ))}
@@ -291,9 +285,6 @@ export function ProductionComparison({ equipes }: ProductionComparisonProps) {
                         <YAxis
                             domain={[0, 'auto']}
                             tickFormatter={(value) => {
-                                if (metric === "couvertureReseau") {
-                                    return `${value}%`;
-                                }
                                 return value;
                             }}
                         />
