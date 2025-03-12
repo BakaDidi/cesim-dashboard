@@ -93,7 +93,7 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
         return hrData.map(hr => ({
             round: `Round ${hr.roundNumero}`,
             employesRD: hr.employesRD,
-            tauxRotation: hr.tauxRotation,
+            tauxRotation: parseFloat(hr.tauxRotation.toFixed(2)),
             budgetFormation: hr.budgetFormation,
             salairesMensuels: hr.salairesMensuels
         }));
@@ -141,6 +141,7 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
     }
 
     const chartData = prepareChartData();
+
 
     return (
         <div className="space-y-6">
@@ -253,7 +254,7 @@ export function HrMetrics({ equipeId }: HrMetricsProps) {
                                 </div>
                                 <div className="p-4 bg-card rounded-lg border border-border">
                                     <p className="text-sm text-muted-foreground">Taux de rotation</p>
-                                    <p className="text-2xl font-bold">{hrData[hrData.length - 1].tauxRotation}%</p>
+                                    <p className="text-2xl font-bold">{hrData[hrData.length - 1].tauxRotation.toFixed(2)}%</p>
                                 </div>
                                 <div className="p-4 bg-card rounded-lg border border-border">
                                     <p className="text-sm text-muted-foreground">Budget formation</p>

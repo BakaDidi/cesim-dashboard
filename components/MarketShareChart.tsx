@@ -274,7 +274,6 @@ export function MarketShareChart({ equipeId, detailed = false }: MarketShareChar
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip content={customPieTooltip} />
                                             <Legend />
                                         </PieChart>
                                     </ResponsiveContainer>

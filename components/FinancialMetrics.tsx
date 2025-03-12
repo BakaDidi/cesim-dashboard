@@ -267,7 +267,7 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                                                 cx="50%"
                                                 cy="50%"
                                                 labelLine={true}
-                                                label={({ name, value, percent }) => `${name}: ${formatCurrency(value)} (${(percent * 100).toFixed(1)}%)`}
+                                                label={({ name, value, percent }) => `${name}: (${(percent * 100).toFixed(1)}%)`}
                                                 outerRadius={80}
                                                 fill="#8884d8"
                                                 dataKey="value"
@@ -339,24 +339,19 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                                             content={({ active, payload }) => {
                                                 if (!active || !payload || !payload.length) return null;
 
+                                                console.log("payload", payload)
                                                 return (
                                                     <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
                                                         <p className="font-bold">{payload[0].payload.round}</p>
                                                         <div className="mt-2 space-y-1">
-                                                            {payload.map((entry, index) => {
-                                                                const name = entry.name === "immobilisations" ? "Immobilisations" :
-                                                                    entry.name === "stocks" ? "Stocks" :
-                                                                        entry.name === "creancesClients" ? "Créances Clients" :
-                                                                            "Trésorerie";
-                                                                return (
-                                                                    <div key={index} className="flex items-center gap-2">
-                                                                        <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
-                                                                        <span>
-                                                                            {name}: {formatCurrency(entry.value)}
-                                                                        </span>
-                                                                    </div>
-                                                                );
-                                                            })}
+                                                            {payload.map((entry, index) => (
+                                                                <div key={index} className="flex items-center gap-2">
+                                                                    <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
+                                                                    <span>
+                                                                        {entry.name}: {formatCurrency(entry.value)}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
                                                 );
