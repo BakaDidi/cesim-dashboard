@@ -416,6 +416,7 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                                             content={({ active, payload }) => {
                                                 if (!active || !payload || !payload.length) return null;
 
+                                                console.log(payload)
                                                 return (
                                                     <div className="bg-popover border border-border rounded-md p-3 shadow-lg text-foreground">
                                                         <p className="font-bold">{payload[0].payload.round}</p>
@@ -424,9 +425,7 @@ export function FinancialMetrics({ equipeId }: FinancialMetricsProps) {
                                                                 <div key={index} className="flex items-center gap-2">
                                                                     <div style={{ width: 12, height: 12, backgroundColor: entry.color }} />
                                                                     <span>
-                                                                        {entry.name === "totalCapitauxPropres"
-                                                                            ? "Capitaux Propres"
-                                                                            : "Dettes"}: {formatCurrency(entry.value)}
+                                                                        {entry.name}: {formatCurrency(entry.value)}
                                                                     </span>
                                                                 </div>
                                                             ))}

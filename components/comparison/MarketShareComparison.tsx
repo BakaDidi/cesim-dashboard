@@ -12,7 +12,10 @@ import {
     ResponsiveContainer,
     BarChart,
     Bar,
-    Cell
+    Cell,
+    PieChart,
+    Pie,
+    Sector
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -48,6 +51,7 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
     const [view, setView] = useState("evolution");
     const [selectedEquipes, setSelectedEquipes] = useState<string[]>([]);
     const [selectedTechno, setSelectedTechno] = useState<string>("total");
+    const [activeIndex, setActiveIndex] = useState(-1);
 
     // Options pour technologies
     const technoOptions: MetricOption[] = [
@@ -153,8 +157,8 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
             });
 
             setChartData(newChartData);
-        } else if (view === "latest") {
-            // Vue du dernier round
+        } else if (view === "latest" || view === "pie") {
+            // Vue du dernier round (utilisée à la fois pour le bar chart et le pie chart)
             const latestRoundData: LatestRoundDataItem[] = [];
 
             // Trouver le numéro du dernier round
@@ -164,7 +168,7 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
                 )
             );
 
-            // Construire des données pour le graphique en barre
+            // Construire des données pour le graphique en barre ou en camembert
             marketShareData.forEach(({ equipe, marketShares }) => {
                 const latestData = marketShares?.find(ms => ms.roundNumero === maxRoundNum);
                 if (latestData) {
@@ -217,6 +221,49 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
         return `${value.toFixed(2)}%`;
     };
 
+    // Pour l'animation du pie chart lors du hover
+    const onPieEnter = (_: any, index: number) => {
+        setActiveIndex(index);
+    };
+
+    const onPieLeave = () => {
+        setActiveIndex(-1);
+    };
+
+    // Rendu du secteur actif pour le pie chart
+    const renderActiveShape = (props: any) => {
+        const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value } = props;
+
+        return (
+            <g>
+                <text x={cx} y={cy} dy={-20} textAnchor="middle" fill="#333">
+                    {payload.equipe}
+                </text>
+                <text x={cx} y={cy} dy={8} textAnchor="middle" fill="#333" fontSize={16} fontWeight="bold">
+                    {formatPercent(value)}
+                </text>
+                <Sector
+                    cx={cx}
+                    cy={cy}
+                    innerRadius={innerRadius}
+                    outerRadius={outerRadius + 10}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    fill={fill}
+                />
+                <Sector
+                    cx={cx}
+                    cy={cy}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    innerRadius={outerRadius + 6}
+                    outerRadius={outerRadius + 10}
+                    fill={fill}
+                />
+            </g>
+        );
+    };
+
     if (isLoading) {
         return <LoadingSpinner />;
     }
@@ -266,8 +313,25 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
         );
     };
 
+    const customPieTooltip = ({ active, payload }: TooltipProps) => {
+        if (!active || !payload || !payload.length) return null;
+
+        const data = payload[0].payload as LatestRoundDataItem;
+
+        return (
+            <div className="bg-background border rounded p-3 shadow-lg">
+                <p className={`font-medium ${data.estMonEquipe ? 'font-bold' : ''}`}>
+                    {data.equipe} {data.estMonEquipe ? '(Mon équipe)' : ''}
+                </p>
+                <p className="mt-1">
+                    <span className="font-bold">{formatPercent(data.value)}</span>
+                </p>
+            </div>
+        );
+    };
+
     // Filtrer les données en toute sécurité pour éviter l'erreur
-    const getFilteredBarData = () => {
+    const getFilteredData = () => {
         if (!Array.isArray(chartData)) return [];
 
         return (chartData as LatestRoundDataItem[]).filter(item => {
@@ -308,6 +372,7 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
                                 <TabsList>
                                     <TabsTrigger value="evolution">Évolution</TabsTrigger>
                                     <TabsTrigger value="latest">Dernier Round</TabsTrigger>
+                                    <TabsTrigger value="pie">Camembert</TabsTrigger>
                                 </TabsList>
                             </Tabs>
                         </div>
@@ -329,7 +394,7 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
                     </div>
                 </div>
 
-                {view === "evolution" && (
+                {(view === "evolution" || view === "pie") && (
                     <div>
                         <button
                             onClick={toggleAllEquipes}
@@ -394,10 +459,10 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
                             ))}
                         </LineChart>
                     </ResponsiveContainer>
-                ) : (
+                ) : view === "latest" ? (
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart
-                            data={getFilteredBarData()}
+                            data={getFilteredData()}
                             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                             layout="vertical"
                         >
@@ -449,6 +514,36 @@ export function MarketShareComparison({ equipes }: MarketShareComparisonProps) {
                                 ))}
                             </Bar>
                         </BarChart>
+                    </ResponsiveContainer>
+                ) : (
+                    // Vue camembert (pie chart)
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                            <Pie
+                                activeIndex={activeIndex}
+                                activeShape={renderActiveShape}
+                                data={getFilteredData()}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={80}
+                                outerRadius={150}
+                                dataKey="value"
+                                nameKey="equipe"
+                                labelLine={false}
+                                onMouseEnter={onPieEnter}
+                                onMouseLeave={onPieLeave}
+                            >
+                                {getFilteredData().map((entry, index) => (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={COLORS[index % COLORS.length]}
+                                        strokeWidth={entry.estMonEquipe ? 2 : 0}
+                                        stroke="#000"
+                                    />
+                                ))}
+                            </Pie>
+                            <Tooltip content={customPieTooltip} />
+                        </PieChart>
                     </ResponsiveContainer>
                 )}
             </div>
